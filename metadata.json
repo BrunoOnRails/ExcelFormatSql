@@ -1,0 +1,5 @@
+{
+  "name": "Excel Formatter Pro",
+  "description": "Uma ferramenta profissional para converter colunas do Excel em listas formatadas com aspas simples e vírgulas, ideal para consultas SQL (IN clauses) ou formatação de dados rápida.",
+  "requestFramePermissions": []
+}
