@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Header from './components/Header';
 import FileUploader from './components/FileUploader';
@@ -35,6 +34,19 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen pb-20 selection:bg-blue-100 selection:text-blue-900">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
+        {/* Botão Voltar */}
+        <div className="pt-4">
+          <a 
+            href="https://brunosilva.dev"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 hover:text-blue-600 bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-200 rounded-xl transition-all duration-200"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Voltar ao Hub
+          </a>
+        </div>
+
         <Header />
 
         <main className="space-y-8">
