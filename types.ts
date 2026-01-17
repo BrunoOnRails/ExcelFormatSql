@@ -4,7 +4,8 @@ export interface ExcelRow {
 }
 
 export interface ParseResult {
-  data: string[];
+  data: any[][]; // Agora retorna a matriz de dados
+  headers: string[]; // Nomes das colunas encontrados
   sheetName: string;
 }
 

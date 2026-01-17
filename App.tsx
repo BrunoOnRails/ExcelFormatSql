@@ -1,13 +1,16 @@
+
 import React, { useState } from 'react';
 import Header from './components/Header';
 import FileUploader from './components/FileUploader';
 import ResultView from './components/ResultView';
+import ColumnSelector from './components/ColumnSelector';
 import { parseFile } from './services/excelService';
-import { QuoteType } from './types';
+import { QuoteType, ParseResult } from './types';
 
 const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [data, setData] = useState<string[]>([]);
+  const [rawData, setRawData] = useState<ParseResult | null>(null);
+  const [finalData, setFinalData] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [quoteType, setQuoteType] = useState<QuoteType>(QuoteType.SINGLE);
   const [removeDots, setRemoveDots] = useState(false);
@@ -15,38 +18,50 @@ const App: React.FC = () => {
   const handleFileSelect = async (file: File) => {
     setIsLoading(true);
     setError(null);
+    setRawData(null);
+    setFinalData([]);
+    
     try {
       const result = await parseFile(file);
-      if (result.data.length === 0) {
-        setError("O arquivo parece estar vazio ou não contém dados válidos.");
-        setData([]);
+      
+      if (result.headers.length === 1) {
+        // Se só tiver uma coluna, já processa direto
+        extractColumnData(result, 0);
       } else {
-        setData(result.data);
+        // Se tiver mais de uma, salva para perguntar ao usuário
+        setRawData(result);
       }
     } catch (err: any) {
       setError(err.message || "Erro desconhecido ao processar o arquivo.");
-      setData([]);
     } finally {
       setIsLoading(false);
     }
   };
 
+  const extractColumnData = (result: ParseResult, columnIndex: number) => {
+    const extracted = result.data
+      .map(row => row[columnIndex])
+      .filter(val => val !== null && val !== undefined && val !== '')
+      .map(val => String(val).trim())
+      .filter(val => val.length > 0);
+
+    if (extracted.length === 0) {
+      setError(`A coluna "${result.headers[columnIndex]}" parece não ter dados válidos.`);
+    } else {
+      setFinalData(extracted);
+      setRawData(null); // Fecha o seletor
+    }
+  };
+
+  const handleReset = () => {
+    setRawData(null);
+    setFinalData([]);
+    setError(null);
+  };
+
   return (
     <div className="min-h-screen pb-20 selection:bg-blue-100 selection:text-blue-900">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
-        {/* Botão Voltar */}
-        <div className="pt-4">
-          <a 
-            href="https://brunosilva.dev"
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 hover:text-blue-600 bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-200 rounded-xl transition-all duration-200"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Voltar ao Hub
-          </a>
-        </div>
-
         <Header />
 
         <main className="space-y-8">
@@ -108,7 +123,17 @@ const App: React.FC = () => {
             </div>
           </div>
 
-          <FileUploader onFileSelect={handleFileSelect} isLoading={isLoading} />
+          {!rawData && finalData.length === 0 && (
+            <FileUploader onFileSelect={handleFileSelect} isLoading={isLoading} />
+          )}
+
+          {rawData && (
+            <ColumnSelector 
+              headers={rawData.headers} 
+              onSelect={(index) => extractColumnData(rawData, index)}
+              onCancel={handleReset}
+            />
+          )}
 
           {error && (
             <div className="p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 text-red-700 animate-in fade-in zoom-in duration-300">
@@ -116,15 +141,26 @@ const App: React.FC = () => {
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
               </svg>
               <span className="text-sm font-medium">{error}</span>
+              <button onClick={handleReset} className="ml-auto text-xs underline font-bold">Tentar novamente</button>
             </div>
           )}
 
-          {data.length > 0 && (
-            <ResultView 
-              items={data} 
-              quoteType={quoteType} 
-              removeDots={removeDots}
-            />
+          {finalData.length > 0 && (
+            <div className="space-y-4">
+              <ResultView 
+                items={finalData} 
+                quoteType={quoteType} 
+                removeDots={removeDots}
+              />
+              <div className="text-center">
+                <button 
+                  onClick={handleReset}
+                  className="text-slate-500 hover:text-blue-600 text-sm font-medium transition-colors"
+                >
+                  ← Enviar outro arquivo
+                </button>
+              </div>
+            </div>
           )}
         </main>
         

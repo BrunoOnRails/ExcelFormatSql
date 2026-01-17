@@ -3,9 +3,7 @@ import * as XLSX from 'xlsx';
 import { ParseResult } from '../types';
 
 /**
- * Processa arquivos Excel ou TXT e extrai os valores.
- * @param file O arquivo enviado pelo usuário
- * @returns Uma promessa com os dados formatados
+ * Processa arquivos Excel ou TXT e extrai os valores estruturados.
  */
 export const parseFile = async (file: File): Promise<ParseResult> => {
   const fileExtension = file.name.split('.').pop()?.toLowerCase();
@@ -23,14 +21,14 @@ const parseTextFile = async (file: File): Promise<ParseResult> => {
     reader.onload = (e) => {
       try {
         const content = e.target?.result as string;
-        // Divide por quebra de linha, remove espaços e filtra vazios
         const lines = content
           .split(/\r?\n/)
           .map(line => line.trim())
           .filter(line => line.length > 0);
 
         resolve({
-          data: lines,
+          data: lines.map(line => [line]), // Formato de matriz para consistência
+          headers: ['Linha de Texto'],
           sheetName: 'Arquivo de Texto'
         });
       } catch (error) {
@@ -54,20 +52,24 @@ const parseExcelFile = async (file: File): Promise<ParseResult> => {
         const firstSheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[firstSheetName];
         
+        // Obtém os dados como matriz (array de arrays)
         const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
         
-        const flattenedData: string[] = jsonData
-          .flat()
-          .filter(val => val !== null && val !== undefined && val !== '')
-          .map(val => String(val).trim())
-          .filter(val => val.length > 0);
+        if (jsonData.length === 0) {
+          throw new Error("Planilha vazia.");
+        }
+
+        // Assume que a primeira linha com dados são os cabeçalhos
+        const headers = jsonData[0].map((h, i) => h ? String(h) : `Coluna ${i + 1}`);
+        const rows = jsonData.slice(1); // O restante são os dados
 
         resolve({
-          data: flattenedData,
+          data: rows,
+          headers: headers,
           sheetName: firstSheetName
         });
       } catch (error) {
-        reject(new Error("Falha ao processar o arquivo Excel."));
+        reject(new Error("Falha ao processar o arquivo Excel. Verifique se há dados."));
       }
     };
 
