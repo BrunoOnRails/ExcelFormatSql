@@ -5,20 +5,16 @@ interface ResultViewProps {
   items: string[];
   quoteType: string;
   removeDots: boolean;
-  onlyNumbers: boolean;
 }
 
-const ResultView: React.FC<ResultViewProps> = ({ items, quoteType, removeDots, onlyNumbers }) => {
+const ResultView: React.FC<ResultViewProps> = ({ items, quoteType, removeDots }) => {
   const [copied, setCopied] = useState(false);
   const [formattedText, setFormattedText] = useState('');
 
   const processItem = (item: string) => {
     let processed = item;
     
-    if (onlyNumbers) {
-      // Remove tudo que não for dígito
-      processed = processed.replace(/\D/g, '');
-    } else if (removeDots) {
+    if (removeDots) {
       // Remove apenas pontos
       processed = processed.replace(/\./g, '');
     }
@@ -29,17 +25,9 @@ const ResultView: React.FC<ResultViewProps> = ({ items, quoteType, removeDots, o
   useEffect(() => {
     const text = items
       .map(processItem)
-      .filter(item => {
-        // Se estivermos em modo "apenas números", filtramos itens que ficaram vazios (não tinham números)
-        if (onlyNumbers) {
-          const val = item.replace(new RegExp(`[${quoteType},]`, 'g'), '');
-          return val.length > 0;
-        }
-        return true;
-      })
       .join(',');
     setFormattedText(text);
-  }, [items, quoteType, removeDots, onlyNumbers]);
+  }, [items, quoteType, removeDots]);
 
   const copyToClipboard = async () => {
     try {

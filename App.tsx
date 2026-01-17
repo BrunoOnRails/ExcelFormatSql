@@ -12,7 +12,6 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [quoteType, setQuoteType] = useState<QuoteType>(QuoteType.SINGLE);
   const [removeDots, setRemoveDots] = useState(false);
-  const [onlyNumbers, setOnlyNumbers] = useState(false);
 
   const handleFileSelect = async (file: File) => {
     setIsLoading(true);
@@ -80,47 +79,20 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            <div className="pt-4 border-t border-slate-50 grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Limpar Pontos</h4>
-                  <p className="text-xs text-slate-500">Remover apenas "."</p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    className="sr-only peer"
-                    checked={removeDots}
-                    onChange={(e) => {
-                      setRemoveDots(e.target.checked);
-                      if (e.target.checked) setOnlyNumbers(false);
-                    }}
-                  />
-                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                </label>
+            <div className="pt-4 border-t border-slate-50 flex items-center justify-between">
+              <div>
+                <h4 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Limpar Pontos</h4>
+                <p className="text-xs text-slate-500">Remover apenas "." do conteúdo</p>
               </div>
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Apenas Números</h4>
-                  <p className="text-xs text-slate-500">Extrair apenas dígitos (0-9)</p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    className="sr-only peer"
-                    checked={onlyNumbers}
-                    onChange={(e) => {
-                      setOnlyNumbers(e.target.checked);
-                      if (e.target.checked) {
-                        setRemoveDots(false);
-                        setQuoteType(QuoteType.NONE);
-                      }
-                    }}
-                  />
-                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
-                </label>
-              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  className="sr-only peer"
+                  checked={removeDots}
+                  onChange={(e) => setRemoveDots(e.target.checked)}
+                />
+                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
             </div>
           </div>
 
@@ -140,7 +112,6 @@ const App: React.FC = () => {
               items={data} 
               quoteType={quoteType} 
               removeDots={removeDots}
-              onlyNumbers={onlyNumbers}
             />
           )}
         </main>
