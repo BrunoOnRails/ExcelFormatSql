@@ -60,11 +60,10 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen pb-20 selection:bg-blue-100 selection:text-blue-900">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
+        <BackButton />
         <Header />
         
         <main className="space-y-8">
-          <BackButton />
-
           <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col gap-6">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div>
