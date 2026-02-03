@@ -1,6 +1,6 @@
-
 import React, { useState } from 'react';
 import Header from './components/Header';
+import BackButton from './components/BackButton';
 import FileUploader from './components/FileUploader';
 import ResultView from './components/ResultView';
 import ColumnSelector from './components/ColumnSelector';
@@ -25,10 +25,8 @@ const App: React.FC = () => {
       const result = await parseFile(file);
       
       if (result.headers.length === 1) {
-        // Se só tiver uma coluna, já processa direto
         extractColumnData(result, 0);
       } else {
-        // Se tiver mais de uma, salva para perguntar ao usuário
         setRawData(result);
       }
     } catch (err: any) {
@@ -49,7 +47,7 @@ const App: React.FC = () => {
       setError(`A coluna "${result.headers[columnIndex]}" parece não ter dados válidos.`);
     } else {
       setFinalData(extracted);
-      setRawData(null); // Fecha o seletor
+      setRawData(null);
     }
   };
 
@@ -63,9 +61,10 @@ const App: React.FC = () => {
     <div className="min-h-screen pb-20 selection:bg-blue-100 selection:text-blue-900">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         <Header />
-
+        
         <main className="space-y-8">
-          {/* Settings Section */}
+          <BackButton />
+
           <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col gap-6">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div>
